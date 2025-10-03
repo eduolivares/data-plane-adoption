@@ -66,8 +66,16 @@ if type qemu-img >/dev/null 2>&1; then
     qemu-img convert -f qcow2 -O raw /tmp/$IMG /tmp/$RAW
     DISK_FORMAT=raw
 fi
-${BASH_ALIASES[openstack]} image show cirros || \
-    ${BASH_ALIASES[openstack]} image create --container-format bare --disk-format $DISK_FORMAT cirros < /tmp/$RAW
+if ! ${BASH_ALIASES[openstack]} image show cirros; then
+    for i in {0..5}; do
+        sleep 2
+        ${BASH_ALIASES[openstack]} image delete cirros || true
+        sleep 2
+        if ${BASH_ALIASES[openstack]} image create --container-format bare --disk-format $DISK_FORMAT cirros < /tmp/$RAW; then
+            break
+        fi
+    done
+fi
 
 # Create flavor
 ${BASH_ALIASES[openstack]} flavor show m1.small || \
