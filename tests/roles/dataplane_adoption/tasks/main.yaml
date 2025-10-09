@@ -8,6 +8,8 @@
 
 # FIXME: missing docs coverage?
 - name: Patch openstackversion to use image built from source or latest if none is defined
+  vars:
+    ansibleee_runner_img: quay.io/eolivare/openstack-ansibleee-runner:osprh-20414
   when: not skip_patching_ansibleee_csv | bool
   no_log: "{{ use_no_log }}"
   ansible.builtin.shell: |
