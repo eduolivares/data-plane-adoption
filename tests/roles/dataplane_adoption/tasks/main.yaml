@@ -552,13 +552,6 @@
         echo "Run out of retries"
         exit 2
 
-# MORTACCI 2
-- name: Fix /var/lib/config-data/ansible-generated owner when bgp
-  when: bgp
-  no_log: "{{ use_no_log }}"
-  ansible.builtin.shell: |
-    for NODE in $(oc get osdpns -o yaml | grep " hostName" | cut -d: -f2 | cut -d. -f1); do ssh $NODE sudo chown -R zuul:zuul /var/lib/config-data/ansible-generated; done
-
 - name: When the clean-up is finished, deploy the OpenStackDataPlaneDeployment CR
   no_log: "{{ use_no_log }}"
   ansible.builtin.shell: |
