@@ -554,6 +554,18 @@
         echo "Run out of retries"
         exit 2
 
+- name: Add default route to EDPM nodes before deploying OpenStackDataPlaneDeployment (bgp)
+  when: bgp
+  ansible.builtin.shell: |
+    {{ shell_header }}
+    if [ "$(ssh {{ item.key }} ip route show default | grep bgp)" != "" ]; then
+        ssh {{ item.key }} sudo ip route del default
+    fi
+    if [ "$(ssh {{ item.key }} ip route show default)" == "" ]; then
+        ssh {{ item.key }} sudo ip route add default via 192.168.111.1
+    fi
+  loop: "{{ edpm_nodes | combine(edpm_nodes_networker | default({})) | dict2items }}"
+
 - name: When the clean-up is finished, deploy the OpenStackDataPlaneDeployment CR
   no_log: "{{ use_no_log }}"
   ansible.builtin.shell: |
